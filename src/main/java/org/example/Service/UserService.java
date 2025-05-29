@@ -5,6 +5,11 @@ import org.example.DTO.SignInDTO;
 import org.example.Entity.UserEntity;
 import org.example.Repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class UserService {
@@ -41,4 +46,27 @@ public class UserService {
         return true;
     }
 
+    public String saveImage(String id, MultipartFile file) throws IOException {
+        String imagePath = "/Users/jiyeon/Desktop/ohaasa";
+
+        if(file.isEmpty()) {
+            throw new IllegalArgumentException("빈 파일은 저장할 수 없습니다.");
+        }
+
+        // 확장자 확인
+        String originalFilename = file.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        if (!extension.matches("\\.(jpg|jpeg|png)$")) {
+            throw new IllegalArgumentException("지원하지 않는 이미지 형식입니다.");
+        }
+
+        // 저장할 파일 이름
+        String filname = id + "_" + extension;
+        // 프로필 이미지 저장하는 로직
+        Path filePath = Paths.get(imagePath, filname);
+
+        // 파일저장
+        file.transferTo(filePath.toFile());
+        return filname;
+    }
 }

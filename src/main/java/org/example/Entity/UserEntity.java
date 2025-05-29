@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -31,12 +33,21 @@ public class UserEntity {
 
     private int zodiac;
 
+    private String image;
+
+    @Column(name = "birth")
+    private LocalDate birth;
+
     @Builder
-    public UserEntity(String id, String pw, String nickname, String email, int zodiac) {
+    public UserEntity(String id, String pw, String nickname, String email, int zodiac, String image, LocalDate birth) {
         this.id = id;
         this.pw = pw;
         this.nickname = nickname;
         this.email = email;
         this.zodiac = zodiac;
+        this.image = image;
+        this.birth = birth;
     }
+
+
 }
