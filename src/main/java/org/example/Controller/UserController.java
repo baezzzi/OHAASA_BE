@@ -2,25 +2,32 @@ package org.example.Controller;
 
 import org.example.DTO.SignInDTO;
 import org.example.DTO.UserDTO;
+import org.example.Entity.UserEntity;
+import org.example.Repository.UserRepository;
 import org.example.Service.UserService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/")
     public String home() {
-        return "hello";
+        System.out.print("hello");
+        return "home";
     }
 
     @PostMapping("/sign-up")
@@ -50,6 +57,20 @@ public class UserController {
             return ResponseEntity.ok("로그인 성공!");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 혹은 비밀번호가 틀렸습니다.");
+        }
+    }
+
+    @PostMapping("/{id}/profile-image")
+    public ResponseEntity<?> uploadProfileImage(@PathVariable("id") String id, @RequestParam("file") MultipartFile file) {
+        try {
+            String filename = userService.saveImage(id, file);
+            UserEntity user = userRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not fount"));
+            user.setImage(filename);
+            userRepository.save(user);
+            return ResponseEntity.ok("이미지 저장 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
