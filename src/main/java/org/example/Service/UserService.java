@@ -7,6 +7,7 @@ import org.example.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +30,12 @@ public class UserService {
 
     public boolean isDuplicate(String id) {
         return userRepository.findById(id).isPresent();
+    }
+
+    public String getNicknameById(String id) {
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        return userEntity.getNickname();
     }
 
     public boolean checkUser(SignInDTO signInDTO) {

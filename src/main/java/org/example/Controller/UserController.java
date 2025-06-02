@@ -73,4 +73,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/find-nickname")
+    public String getNicknameById(@RequestParam("id") String id) {
+        return userService.getNicknameById(id);
+    }
 }
