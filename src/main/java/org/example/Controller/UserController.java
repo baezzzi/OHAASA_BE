@@ -52,12 +52,18 @@ public class UserController {
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody SignInDTO signInDTO) {
         boolean success = userService.checkUser(signInDTO);
-
-        if (success) {
-            return ResponseEntity.ok("로그인 성공!");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 혹은 비밀번호가 틀렸습니다.");
+//        if (success) {
+//            return ResponseEntity.ok("로그인 성공!");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 혹은 비밀번호가 틀렸습니다.");
+//        }
+        if (!success) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("hello");  // Flutter에서 받을 메시지
         }
+
+        return ResponseEntity.ok("로그인 성공!");
     }
 
     @PostMapping("/{id}/profile-image")
