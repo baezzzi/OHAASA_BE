@@ -38,8 +38,11 @@ public class UserEntity {
     @Column(name = "birth")
     private LocalDate birth;
 
+    @Column(name = "fcm_token")
+    private String fcmToken;
+
     @Builder
-    public UserEntity(String id, String pw, String nickname, String email, int zodiac, String image, LocalDate birth) {
+    public UserEntity(String id, String pw, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
         this.id = id;
         this.pw = pw;
         this.nickname = nickname;
@@ -47,6 +50,7 @@ public class UserEntity {
         this.zodiac = zodiac;
         this.image = image;
         this.birth = birth;
+        this.fcmToken = fcmToken;
     }
 
 

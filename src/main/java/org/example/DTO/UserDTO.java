@@ -5,6 +5,8 @@ import org.example.Entity.UserEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class UserDTO {
@@ -15,6 +17,7 @@ public class UserDTO {
     private String nickname;
     private String email;
     private int zodiac;
+    private LocalDate birth;
 
     public UserEntity toEntity() {
         return UserEntity.builder()
@@ -23,6 +26,7 @@ public class UserDTO {
                 .nickname(this.nickname)
                 .email(this.email)
                 .zodiac(this.zodiac)
+                .birth(this.birth)
                 .build();
     }
 }

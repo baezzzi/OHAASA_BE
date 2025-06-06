@@ -24,9 +24,10 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    implementation("mysql:mysql-connector-java:8.0.30")
+    implementation("mysql:mysql-connector-java:8.0.33")
 
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation ("com.google.firebase:firebase-admin:9.5.0")
 }
 
 tasks.test {
