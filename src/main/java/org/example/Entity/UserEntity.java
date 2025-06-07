@@ -19,14 +19,12 @@ import java.time.LocalDate;
 public class UserEntity {
 
     @Id
-    @Column(length = 20, nullable = false)
-    private String id;
+    @Column(length = 10)
+    private String nickname;
 
     @Column(length = 15, nullable = false)
     private String pw;
 
-    @Column(length = 10)
-    private String nickname;
 
     @Column(length = 30, nullable = false)
     private String email;
@@ -42,11 +40,10 @@ public class UserEntity {
     private String fcmToken;
 
     @Builder
-    public UserEntity(String id, String pw, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
-        this.id = id;
+    public UserEntity(String nickname, String pw, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
+        this.email = email;
         this.pw = pw;
         this.nickname = nickname;
-        this.email = email;
         this.zodiac = zodiac;
         this.image = image;
         this.birth = birth;

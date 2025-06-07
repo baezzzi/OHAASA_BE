@@ -30,24 +30,24 @@ public class UserController {
         return "home";
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {
-        try {
-            userService.createUser(userDTO);
-            return ResponseEntity.ok("회원가입 성공!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+//    @PostMapping("/sign-up")
+//    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {
+//        try {
+//            userService.createUser(userDTO);
+//            return ResponseEntity.ok("회원가입 성공!");
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
 
-    @GetMapping("/check-id")
-    public ResponseEntity<String> checkId(@RequestParam("id") String id) {
-        boolean isDuplicate = userService.isDuplicate(id);
-        if (isDuplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다.");
-        }
-        return ResponseEntity.ok("사용 가능한 아이디입니다.");
-    }
+//    @GetMapping("/check-id")
+//    public ResponseEntity<String> checkId(@RequestParam("id") String id) {
+//        boolean isDuplicate = userService.isDuplicate(id);
+//        if (isDuplicate) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다.");
+//        }
+//        return ResponseEntity.ok("사용 가능한 아이디입니다.");
+//    }
 
     @PostMapping("/sign-in")
     public ResponseEntity<String> signIn(@RequestBody SignInDTO signInDTO) {
