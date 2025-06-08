@@ -21,10 +21,12 @@ public class UserService {
     }
 
     public void createUser(UserDTO userDTO) {
+        userDTO.setFirstLogin(true);
         UserEntity newUser = userDTO.toEntity();
         userRepository.save(newUser);
     }
 
+    // zodiac_setting에서 쓰는 거 (생일, 별자리 저장)
     public void updateBirthInfoByEmail(String email, UserDTO userDTO) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));

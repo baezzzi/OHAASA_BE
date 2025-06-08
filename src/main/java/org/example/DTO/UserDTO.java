@@ -17,6 +17,7 @@ public class UserDTO {
     private int zodiac;
     private LocalDate birth;
     private String uid;
+    private boolean firstLogin;
 
     public UserEntity toEntity() {
         return UserEntity.builder()
@@ -25,6 +26,7 @@ public class UserDTO {
                 .zodiac(this.zodiac)
                 .birth(this.birth)
                 .uid(this.uid)
+                .firstLogin(this.firstLogin)
                 .build();
     }
 }

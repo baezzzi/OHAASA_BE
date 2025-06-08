@@ -1,6 +1,5 @@
 package org.example.Controller;
 
-import org.apache.coyote.Response;
 import org.example.DTO.SignInDTO;
 import org.example.DTO.UserDTO;
 import org.example.Entity.UserEntity;
@@ -12,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
@@ -50,7 +52,33 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    };
+    }
+
+    // 튜토리얼 true일 때
+    @PostMapping("/is-first-login")
+    public ResponseEntity<Map<String, Boolean>> isFirstLogin(@RequestParam String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("firstLogin", user.isFirstLogin());
+        System.out.println(user.isFirstLogin());
+        return ResponseEntity.ok(response);
+    }
+
+    // 튜토리얼 완료
+    @PostMapping("/complete-tutorial")
+    public ResponseEntity<String> completeTutorial(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        user.setFirstLogin(false);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("튜토리얼 완료");
+    }
 
 //    @PostMapping("/sign-up")
 //    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {
@@ -71,22 +99,6 @@ public class UserController {
 //        return ResponseEntity.ok("사용 가능한 아이디입니다.");
 //    }
 
-    @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody SignInDTO signInDTO) {
-        boolean success = userService.checkUser(signInDTO);
-//        if (success) {
-//            return ResponseEntity.ok("로그인 성공!");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 혹은 비밀번호가 틀렸습니다.");
-//        }
-        if (!success) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("hello");  // Flutter에서 받을 메시지
-        }
-
-        return ResponseEntity.ok("로그인 성공!");
-    }
 
     @PostMapping("/{id}/profile-image")
     public ResponseEntity<?> uploadProfileImage(@PathVariable("id") String id, @RequestParam("file") MultipartFile file) {

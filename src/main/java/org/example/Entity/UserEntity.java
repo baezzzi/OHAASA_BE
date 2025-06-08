@@ -38,8 +38,11 @@ public class UserEntity {
 
     private String uid;
 
+    @Column(name = "first_login")
+    private boolean firstLogin = true;
+
     @Builder
-    public UserEntity(int id, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken, String uid) {
+    public UserEntity(int id, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken, String uid, boolean firstLogin) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -48,6 +51,7 @@ public class UserEntity {
         this.birth = birth;
         this.fcmToken = fcmToken;
         this.uid = uid;
+        this.firstLogin = firstLogin;
     }
 
 
