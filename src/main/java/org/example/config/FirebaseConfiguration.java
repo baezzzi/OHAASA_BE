@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class FirebaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(FirebaseConfiguration.class);
 
-    String fileUrl = "hello";
+    String fileUrl = "/Users/jiyeon/Desktop/OzOfirebasePrivateKey.json";
     @PostConstruct
     public void init() {
         try {

@@ -19,15 +19,12 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
+    @Column(length = 30, nullable = false)
+    private String email;
+
     @Column(length = 10)
     private String nickname;
 
-    @Column(length = 15, nullable = false)
-    private String pw;
-
-
-    @Column(length = 30, nullable = false)
-    private String email;
 
     private int zodiac;
 
@@ -39,16 +36,18 @@ public class UserEntity {
     @Column(name = "fcm_token")
     private String fcmToken;
 
+    private String uid;
+
     @Builder
-    public UserEntity(int id, String nickname, String pw, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
+    public UserEntity(int id, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken, String uid) {
         this.id = id;
         this.email = email;
-        this.pw = pw;
         this.nickname = nickname;
         this.zodiac = zodiac;
         this.image = image;
         this.birth = birth;
         this.fcmToken = fcmToken;
+        this.uid = uid;
     }
 
 

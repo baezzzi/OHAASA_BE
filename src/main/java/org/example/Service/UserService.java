@@ -21,11 +21,19 @@ public class UserService {
     }
 
     public void createUser(UserDTO userDTO) {
-        if(!userDTO.getPw().equals((userDTO.getCheckpw()))) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
         UserEntity newUser = userDTO.toEntity();
         userRepository.save(newUser);
+    }
+
+    public void updateBirthInfoByEmail(String email, UserDTO userDTO) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+
+        // 생일, 별자리 등 업데이트
+        user.setBirth(userDTO.getBirth());
+        user.setZodiac(userDTO.getZodiac());
+
+        userRepository.save(user); // 변경사항 저장
     }
 
     public boolean isDuplicate(String id) {
@@ -47,9 +55,9 @@ public class UserService {
         UserEntity userEntity = userRepository.findById(signInDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
 
-        if (!signInDTO.getPw().equals(userEntity.getPw())) {
-            throw new IllegalArgumentException("아이디 혹은 비밀번호가 틀렸습니다.");
-        }
+//        if (!signInDTO.getPw().equals(userEntity.getPw())) {
+//            throw new IllegalArgumentException("아이디 혹은 비밀번호가 틀렸습니다.");
+//        }
         return true;
     }
 

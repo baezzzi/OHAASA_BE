@@ -1,5 +1,6 @@
 package org.example.Controller;
 
+import org.apache.coyote.Response;
 import org.example.DTO.SignInDTO;
 import org.example.DTO.UserDTO;
 import org.example.Entity.UserEntity;
@@ -29,6 +30,27 @@ public class UserController {
         System.out.print("hello");
         return "home";
     }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {
+        try {
+            // email, uid 전달받음
+            userService.createUser(userDTO);
+            return ResponseEntity.ok("회원가입 성공!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/birth")
+    public ResponseEntity<String> birth(@RequestParam String email, @RequestBody UserDTO userDTO) {
+        try {
+            userService.updateBirthInfoByEmail(email, userDTO);
+            return ResponseEntity.ok("별자리와 생일 저장완료");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    };
 
 //    @PostMapping("/sign-up")
 //    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {

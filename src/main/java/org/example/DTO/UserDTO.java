@@ -12,20 +12,19 @@ import java.time.LocalDate;
 public class UserDTO {
 
     private String id;
-    private String pw;
-    private String checkpw;
     private String nickname;
     private String email;
     private int zodiac;
     private LocalDate birth;
+    private String uid;
 
     public UserEntity toEntity() {
         return UserEntity.builder()
-                .pw(this.pw)
-                .nickname(this.nickname)
                 .email(this.email)
+                .nickname(this.nickname)
                 .zodiac(this.zodiac)
                 .birth(this.birth)
+                .uid(this.uid)
                 .build();
     }
 }
