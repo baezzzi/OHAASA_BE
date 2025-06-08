@@ -21,7 +21,6 @@ public class UserDTO {
 
     public UserEntity toEntity() {
         return UserEntity.builder()
-                .id(this.id)
                 .pw(this.pw)
                 .nickname(this.nickname)
                 .email(this.email)

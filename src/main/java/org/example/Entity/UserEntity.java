@@ -1,9 +1,6 @@
 package org.example.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +16,9 @@ import java.time.LocalDate;
 public class UserEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
+
     @Column(length = 10)
     private String nickname;
 
@@ -40,7 +40,8 @@ public class UserEntity {
     private String fcmToken;
 
     @Builder
-    public UserEntity(String nickname, String pw, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
+    public UserEntity(int id, String nickname, String pw, String email, int zodiac, String image, LocalDate birth, String fcmToken) {
+        this.id = id;
         this.email = email;
         this.pw = pw;
         this.nickname = nickname;
