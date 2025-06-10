@@ -32,6 +32,8 @@ dependencies {
     implementation ("org.jsoup:jsoup:1.17.2")
     implementation("org.seleniumhq.selenium:selenium-java:4.17.0")
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
+    runtimeOnly ("io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64")
+
 
 
 }

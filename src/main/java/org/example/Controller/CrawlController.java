@@ -1,5 +1,6 @@
 package org.example.Controller;
 
+import org.example.Entity.TodayEntity;
 import org.example.Service.CrawlService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,12 @@ public class CrawlController {
         return crawlService.translate(source, target, text);
     }
 
-    @PostMapping("/horoscope/translated")
-    public List<Map<String, String>> getTranslatedHoroscopes() throws IOException {
-        return crawlService.translateApply();
+    // 이거 스케줄러로 바꿔야됨 지금은 내가 요청해야지만 저장함
+    @PostMapping("/horoscope/save")
+    public String saveTranslatedHoroscopes() throws IOException {
+        crawlService.translateSaveAndApply();
+        return "크롤링 및 번역 결과 저장이 완료되었습니다.";
     }
+
 
 }

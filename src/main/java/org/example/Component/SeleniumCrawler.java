@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class SeleniumCrawler {
@@ -45,8 +47,20 @@ public class SeleniumCrawler {
             List<WebElement> liElement = ulElement.findElements(By.tagName("li"));
             List<Map<String, String>> result = new ArrayList<>();
 
+            // 날짜 가져오기
+            String DayElement = driver.findElement(By.className("oa_horoscope_date")).getText();
+            Matcher m = Pattern.compile("\\d+").matcher(DayElement);
+            List<String> numbers = new ArrayList<>();
+            while (m.find()) {
+                numbers.add(m.group());
+            }
+            String month = numbers.get(0).length() == 1 ? "0" + numbers.get(0) : numbers.get(0);
+            String day = numbers.get(1).length() == 1 ? "0" + numbers.get(1) : numbers.get(1);
+            String mmdd = month + "-" + day;
+
             // li rank 속성 분리
             for (WebElement li : liElement) {
+
                 String classAttr = li.getAttribute("class");
                 String[] classes = classAttr.split(" ");
                 String sign = classes[classes.length - 1];
@@ -62,6 +76,7 @@ public class SeleniumCrawler {
                 Map<String, String> item = new HashMap<>();
                 item.put("horoTxt", horoTxt);
                 item.put("name", sign);
+                item.put("date", mmdd);
                 result.add(item);
             }
 
