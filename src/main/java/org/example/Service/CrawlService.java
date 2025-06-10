@@ -14,11 +14,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class CrawlService {
@@ -70,17 +67,7 @@ public class CrawlService {
         return Objects.requireNonNull(response).getMessage().getResult().getTranslatedText();
     }
 
-//    // 번역 결과 적용
-//    public List<Map<String, String>> translateApply() throws IOException {
-//        List<Map<String, String>> result = crawler.crawl();
-//        for (Map<String, String> item : result) {
-//            String horoTxt = item.get("horoTxt");
-//            String translatedText = translate("ja","ko",horoTxt);
-//            item.put("translatedText", translatedText);
-//        }
-//        return result;
-//    }
-
+    // 번역 결과 저장 로직
     public void translateSaveAndApply() throws IOException {
         List<Map<String, String>> result = crawler.crawl();
         int index = 1; // rank 나타냄
@@ -122,5 +109,20 @@ public class CrawlService {
             System.out.println("DB 저장완료");
             index++;
         }
+    }
+
+    // DB에서 랭킹 가져오는 로직
+    public List<Map<String, String>> getTodayRank(LocalDate date) {
+        List<TodayEntity> todayEntities = todayRepository.findByDate(date);
+        List<Map<String, String>> result = new ArrayList<>();
+        for (TodayEntity entity : todayEntities) {
+            Map<String, String> item = new HashMap<>();
+            item.put("name", entity.getName());
+            item.put("content", entity.getContent());
+            item.put("lucky", entity.getLucky());
+            item.put("rank", String.valueOf(entity.getRank()));
+            result.add(item);
+        }
+        return result;
     }
 }

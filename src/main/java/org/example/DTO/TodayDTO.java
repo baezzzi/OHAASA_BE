@@ -2,7 +2,7 @@ package org.example.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.Entity.TodayEntity;
+//import org.example.Entity.TodayEntity;
 
 import java.time.LocalDate;
 
@@ -16,13 +16,13 @@ public class TodayDTO {
     private int rank;
     private LocalDate date;
 
-    public TodayEntity toEntity() {
-        return TodayEntity.builder()
-                .name(this.name)
-                .content(this.content)
-                .lucky(this.lucky)
-                .rank(this.rank)
-                .build();
-
-    }
+//    public TodayEntity toEntity() {
+//        return TodayEntity.builder()
+//                .name(this.name)
+//                .content(this.content)
+//                .lucky(this.lucky)
+//                .rank(this.rank)
+//                .build();
+//
+//    }
 }
