@@ -53,11 +53,12 @@ public class SeleniumCrawler {
 
                 String horoTxt = "";
                 try {
-                    horoTxt = li.findElement(By.className("horo_txt")).getText();
+                    String horoElement = li.findElement(By.className("horo_txt")).getText();
+                    String[] horoText = horoElement.split(" ");
+                    horoTxt = String.join("\n", horoText);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-
                 Map<String, String> item = new HashMap<>();
                 item.put("horoTxt", horoTxt);
                 item.put("name", sign);

@@ -31,6 +31,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-admin:9.5.0")
     implementation ("org.jsoup:jsoup:1.17.2")
     implementation("org.seleniumhq.selenium:selenium-java:4.17.0")
+    implementation ("org.springframework.boot:spring-boot-starter-webflux")
+
 
 }
 
