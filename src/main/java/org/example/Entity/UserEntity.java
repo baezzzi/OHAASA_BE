@@ -25,7 +25,6 @@ public class UserEntity {
     @Column(length = 10)
     private String nickname;
 
-
     private int zodiac;
 
     private String image;

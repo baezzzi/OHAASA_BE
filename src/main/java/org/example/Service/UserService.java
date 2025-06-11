@@ -38,29 +38,25 @@ public class UserService {
         userRepository.save(user); // 변경사항 저장
     }
 
-    public boolean isDuplicate(String id) {
-        return userRepository.findById(id).isPresent();
+    // 닉네임 저장하는 거
+    public void updateNicknameByEmail(String email, String nickname) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+
+        user.setNickname(nickname);
+        userRepository.save(user);
     }
 
-    public String getNicknameById(String id) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    public String getNicknameByEmail(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
         return userEntity.getNickname();
     }
 
-    public boolean checkUser(SignInDTO signInDTO) {
-        if (signInDTO == null) {
-            throw new IllegalArgumentException("입력값이 올바르지 않습니다.");
-        }
-
-        // DB에서 id로 유저 조회
-        UserEntity userEntity = userRepository.findById(signInDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
-
-//        if (!signInDTO.getPw().equals(userEntity.getPw())) {
-//            throw new IllegalArgumentException("아이디 혹은 비밀번호가 틀렸습니다.");
-//        }
-        return true;
+    public int getZodiacByEmail(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+        return user.getZodiac();
     }
 
     public String saveImage(String id, MultipartFile file) throws IOException {

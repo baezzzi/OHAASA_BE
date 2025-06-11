@@ -1,21 +1,18 @@
 package org.example.Controller;
 
-import org.example.DTO.SignInDTO;
 import org.example.DTO.UserDTO;
 import org.example.Entity.UserEntity;
 import org.example.Repository.UserRepository;
 import org.example.Service.UserService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
 
@@ -55,7 +52,7 @@ public class UserController {
     }
 
     // 튜토리얼 true일 때
-    @PostMapping("/is-first-login")
+    @GetMapping("/is-first-login")
     public ResponseEntity<Map<String, Boolean>> isFirstLogin(@RequestParam String email) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
@@ -80,26 +77,6 @@ public class UserController {
         return ResponseEntity.ok("튜토리얼 완료");
     }
 
-//    @PostMapping("/sign-up")
-//    public ResponseEntity<String> signUp(@RequestBody UserDTO userDTO) {
-//        try {
-//            userService.createUser(userDTO);
-//            return ResponseEntity.ok("회원가입 성공!");
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-
-//    @GetMapping("/check-id")
-//    public ResponseEntity<String> checkId(@RequestParam("id") String id) {
-//        boolean isDuplicate = userService.isDuplicate(id);
-//        if (isDuplicate) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 사용 중인 아이디입니다.");
-//        }
-//        return ResponseEntity.ok("사용 가능한 아이디입니다.");
-//    }
-
-
     @PostMapping("/{id}/profile-image")
     public ResponseEntity<?> uploadProfileImage(@PathVariable("id") String id, @RequestParam("file") MultipartFile file) {
         try {
@@ -115,7 +92,28 @@ public class UserController {
     }
 
     @GetMapping("/find-nickname")
-    public String getNicknameById(@RequestParam("id") String id) {
-        return userService.getNicknameById(id);
+    public String getNicknameById(@RequestParam String email) {
+        return userService.getNicknameByEmail(email);
+    }
+
+    @PostMapping("/save-nickname")
+    public ResponseEntity<String> saveNickname(@RequestBody UserDTO userDTO) {
+        String email = userDTO.getEmail();
+        String nickname = userDTO.getNickname();
+        try{
+            userService.updateNicknameByEmail(email, nickname);
+            return ResponseEntity.ok("닉네임 저장 완료");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/find-zodiac")
+    public int getZodiacByEmail(@RequestParam String email) {
+        try {
+            return userService.getZodiacByEmail(email);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
