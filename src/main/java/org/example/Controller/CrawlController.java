@@ -2,7 +2,6 @@ package org.example.Controller;
 
 import org.example.Service.CrawlService;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -44,4 +43,10 @@ public class CrawlController {
         return crawlService.getTodayRank(date);
     }
 
+    @GetMapping(value = "/content-lucky", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+    public List<Map<String, String>> getContentLucky(@RequestParam String name) {
+        LocalDate date = LocalDate.now();
+        System.out.println(crawlService.getContentLucky(name, date));
+        return crawlService.getContentLucky(name, date);
+    }
 }

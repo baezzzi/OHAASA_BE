@@ -125,4 +125,19 @@ public class CrawlService {
         }
         return result;
     }
+
+    public List<Map<String, String>> getContentLucky(String name, LocalDate date) {
+        List<TodayEntity> todayEntities = todayRepository.findByDate(date);
+        List<Map<String, String>> result = new ArrayList<>();
+        for (TodayEntity entity : todayEntities) {
+            Map<String, String> item = new HashMap<>();
+            if (entity.getName().equals(name)) {
+                item.put("content", entity.getContent());
+                item.put("lucky", entity.getLucky());
+                item.put("rank", String.valueOf(entity.getRank()));
+                result.add(item);
+            }
+        }
+        return result;
+    }
 }
