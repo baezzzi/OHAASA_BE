@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,10 +46,16 @@ public class UserController {
     public ResponseEntity<String> birth(@RequestParam String email, @RequestBody UserDTO userDTO) {
         try {
             userService.updateBirthInfoByEmail(email, userDTO);
+            System.out.println(userDTO);
             return ResponseEntity.ok("별자리와 생일 저장완료");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/find-birth")
+    public LocalDate findBirth(@RequestParam String email) {
+        return userService.getBirthByEmail(email);
     }
 
     // 튜토리얼 true일 때

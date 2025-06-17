@@ -11,6 +11,7 @@ import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 @Service
 public class UserService {
@@ -57,6 +58,12 @@ public class UserService {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
         return user.getZodiac();
+    }
+
+    public LocalDate getBirthByEmail(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+        return user.getBirth();
     }
 
     public String saveImage(String id, MultipartFile file) throws IOException {
