@@ -89,4 +89,10 @@ public class UserService {
         file.transferTo(filePath.toFile());
         return filname;
     }
+
+    public void deleteUser(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+        userRepository.delete(user);
+    }
 }

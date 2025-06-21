@@ -123,4 +123,15 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/delete-user")
+    public ResponseEntity<String> deleteUser(@RequestBody UserDTO userDTO) {
+        String email = userDTO.getEmail();
+        try {
+            userService.deleteUser(email);
+            return ResponseEntity.ok("사용자 삭제");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
