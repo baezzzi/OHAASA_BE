@@ -1,13 +1,11 @@
 package org.example.Service;
 
 import org.example.DTO.UserDTO;
-import org.example.DTO.SignInDTO;
 import org.example.Entity.UserEntity;
 import org.example.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,7 +25,7 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    // zodiac_setting에서 쓰는 거 (생일, 별자리 저장)
+    // zodiac setting 에서 쓰는 거 (생일, 별자리 저장)
     public void updateBirthInfoByEmail(String email, UserDTO userDTO) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
