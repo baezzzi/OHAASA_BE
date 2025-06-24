@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,8 @@ public class FriendController {
 
     @GetMapping(value = "/find-friend", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
     public List<Map<String, String>> findFriend(@RequestParam String email) {
-        return friendService.findFriend(email);
+        LocalDate date = LocalDate.now();
+        return friendService.findFriend(email, date);
     }
 
     @PostMapping("/delete-friend")
