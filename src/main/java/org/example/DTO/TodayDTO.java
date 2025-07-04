@@ -2,9 +2,8 @@ package org.example.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
-//import org.example.Entity.TodayEntity;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -14,15 +13,6 @@ public class TodayDTO {
     private String content;
     private String lucky;
     private int rank;
-    private LocalDate date;
+    private Date date;
 
-//    public TodayEntity toEntity() {
-//        return TodayEntity.builder()
-//                .name(this.name)
-//                .content(this.content)
-//                .lucky(this.lucky)
-//                .rank(this.rank)
-//                .build();
-//
-//    }
 }

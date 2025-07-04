@@ -1,96 +1,175 @@
 package org.example.Service;
 
+import com.google.api.core.ApiFuture;
+import com.google.api.gax.rpc.ApiException;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.example.DTO.UserDTO;
 import org.example.Entity.UserEntity;
-import org.example.Repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final static String COLLECTION_NAME = "users";
 
-    public void createUser(UserDTO userDTO) {
+
+    public void createUser(UserDTO userDTO) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
         userDTO.setFirstLogin(true);
         UserEntity newUser = userDTO.toEntity();
-        userRepository.save(newUser);
+
+        // 이메일이 문서 Id
+        String docId = newUser.getEmail();
+
+        try {
+            ApiFuture<WriteResult> future = db
+                    .collection("users")
+                    .document(docId)
+                    .set(newUser);
+            future.get();
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     // zodiac setting 에서 쓰는 거 (생일, 별자리 저장)
-    public void updateBirthInfoByEmail(String email, UserDTO userDTO) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+    public void updateBirthInfoByEmail(String email, UserDTO userDTO) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
 
-        // 생일, 별자리 등 업데이트
-        user.setBirth(userDTO.getBirth());
-        user.setZodiac(userDTO.getZodiac());
+        String docId = collection.document(email).getId();
 
-        userRepository.save(user); // 변경사항 저장
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("birth", userDTO.getBirth());
+        updates.put("zodiac", userDTO.getZodiac());
+
+        DocumentReference docRef = collection.document(docId);
+        try {
+            ApiFuture<WriteResult> writeResult = docRef.update(updates);
+            writeResult.get(); // 예외 발생 시 catch 로 이동
+        } catch (InterruptedException | ExecutionException e) {
+            // 예외 처리 로직
+            throw new RuntimeException("업데이트 실패", e);
+        }
+
     }
 
     // 닉네임 저장하는 거
-    public void updateNicknameByEmail(String email, String nickname) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
+    public void updateNicknameByEmail(String email, String nickname) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
 
-        user.setNickname(nickname);
-        userRepository.save(user);
-    }
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
 
-    public String getNicknameByEmail(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
-        return userEntity.getNickname();
-    }
-
-    public int getZodiacByEmail(String email) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
-        return user.getZodiac();
-    }
-
-    public LocalDate getBirthByEmail(String email) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
-        return user.getBirth();
-    }
-
-    public String saveImage(String id, MultipartFile file) throws IOException {
-        String imagePath = "/Users/jiyeon/Desktop/ohaasa";
-
-        if(file.isEmpty()) {
-            throw new IllegalArgumentException("빈 파일은 저장할 수 없습니다.");
+        if (snapshot.isEmpty()) {
+            throw new IllegalArgumentException("해당 이메일로 등록된 사용자가 없습니다.");
         }
 
-        // 확장자 확인
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        if (!extension.matches("\\.(jpg|jpeg|png)$")) {
-            throw new IllegalArgumentException("지원하지 않는 이미지 형식입니다.");
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("nickname", nickname);
+
+        DocumentReference docRef = collection.document(document.getId());
+        try {
+            ApiFuture<WriteResult> writeResult = docRef.update(updates);
+            writeResult.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("업데이트 실패", e);
         }
-
-        // 저장할 파일 이름
-        String filname = id + "_" + extension;
-        // 프로필 이미지 저장하는 로직
-        Path filePath = Paths.get(imagePath, filname);
-
-        // 파일저장
-        file.transferTo(filePath.toFile());
-        return filname;
     }
 
-    public void deleteUser(String email) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이메일로 등록된 유저가 없습니다."));
-        userRepository.delete(user);
+    public String getNicknameByEmail(String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
+
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+
+        if (snapshot.isEmpty()) {
+            throw new IllegalArgumentException("해당 이메일로 등록된 사용자가 없습니다.");
+        }
+
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+        return document.getString("nickname");
+    }
+
+    public int getZodiacByEmail(String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
+
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+
+        if (snapshot.isEmpty()) {
+            throw new IllegalArgumentException("해당 이메일로 등록된 사용자가 없습니다.");
+        }
+
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+        Long zodiacLong = document.getLong("zodiac");
+
+        return Objects.requireNonNull(zodiacLong).intValue();
+    }
+
+    public Date getBirthByEmail(String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
+
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+
+        if (snapshot.isEmpty()) {
+            throw new IllegalArgumentException("해당 이메일로 등록된 사용자가 없습니다.");
+        }
+
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+        return document.getDate("birth");
+    }
+
+    public void deleteUser(String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
+
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+
+        if (snapshot.isEmpty()) {
+            throw new IllegalArgumentException("해당 이메일로 등록된 사용자가 없습니다.");
+        }
+
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+        collection.document(document.getId()).delete();
+    }
+
+    public ResponseEntity<String> findUser(String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection(COLLECTION_NAME);
+
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
+
+        if(snapshot.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        DocumentSnapshot document = snapshot.getDocuments().get(0);
+        return ResponseEntity.ok().body(document.getString("nickname"));
     }
 }

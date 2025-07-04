@@ -4,17 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.Entity.FriendEntity;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
 public class FriendDTO {
-    private int id;
+
     private String email;
     private String name;
-    private LocalDate birth;
+    private Date birth;
     private String zodiac;
-    private int idx;
 
     public FriendEntity toEntity() {
         return FriendEntity.builder()
@@ -22,7 +21,6 @@ public class FriendDTO {
                 .name(this.name)
                 .birth(this.birth)
                 .zodiac(this.zodiac)
-                .idx(this.idx)
                 .build();
     }
 }

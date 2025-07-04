@@ -5,7 +5,7 @@ import org.example.Entity.UserEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class UserDTO {
     private String nickname;
     private String email;
     private int zodiac;
-    private LocalDate birth;
+    private Date birth;
     private String uid;
     private boolean firstLogin;
 

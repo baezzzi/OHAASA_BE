@@ -1,6 +1,5 @@
 package org.example.DTO;
 
-import com.google.firebase.database.annotations.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -4,10 +4,10 @@ import org.example.Service.CrawlService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/crawl")
@@ -29,24 +29,24 @@ public class CrawlController {
         return crawlService.translate(source, target, text);
     }
 
-    // 이거 스케줄러로 바꿔야됨 지금은 내가 요청해야지만 저장함
-    @PostMapping("/horoscope/save")
-    public String saveTranslatedHoroscopes() throws IOException {
-        crawlService.translateSaveAndApply();
-        return "크롤링 및 번역 결과 저장이 완료되었습니다.";
-    }
-
     @GetMapping(value = "horoscope/ranking",
             produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
     public List<Map<String, String>> getRanking() {
         LocalDate date = LocalDate.now();
-        return crawlService.getTodayRank(date);
+        try {
+            return crawlService.getTodayRank(date);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping(value = "/content-lucky", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-    public List<Map<String, String>> getContentLucky(@RequestParam String name) {
+    public List<Map<String, String>> getContentLucky(@RequestParam String name) {  // param name 은 en zodiac
         LocalDate date = LocalDate.now();
-        System.out.println(crawlService.getContentLucky(name, date));
-        return crawlService.getContentLucky(name, date);
+        try {
+            return crawlService.getContentLucky(name, date);
+        } catch(InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -3,29 +3,37 @@ package org.example.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Configuration;
-
-import java.io.FileInputStream;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.core.io.ClassPathResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Configuration
-public class FirebaseConfiguration {
+import java.io.InputStream;
+
+@Component // ✅ @Configuration → @Component 로 변경
+public class FirebaseConfiguration implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(FirebaseConfiguration.class);
 
-    String fileUrl = "/Users/jiyeon/Desktop/OzOfirebasePrivateKey.json";
-    @PostConstruct
-    public void init() {
+    @Override
+    public void run(ApplicationArguments args) {
         try {
-            FileInputStream serviceAccount = new FileInputStream(fileUrl);
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-            FirebaseApp.initializeApp(options);
-            logger.info("firebase initialized");
+            if (FirebaseApp.getApps().isEmpty()) {
+                ClassPathResource resource = new ClassPathResource("firebase/OzOfirebasePrivateKey.json");
+                InputStream serviceAccount = resource.getInputStream();
+
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                FirebaseApp.initializeApp(options);
+                logger.info("✅ Firebase initialized in ApplicationRunner");
+            } else {
+                logger.info("Firebase already initialized. Skipping.");
+            }
         } catch (Exception e) {
-            logger.error("에러 설명", e);
+            logger.error("🔥 Firebase 초기화 실패", e);
         }
     }
 }

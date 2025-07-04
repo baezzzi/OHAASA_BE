@@ -1,7 +1,8 @@
 package org.example.Service;
 
-import org.example.Entity.TodayEntity;
-import org.example.Repository.TodayRepository;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +17,23 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class CrawlService {
+
+//    private Firestore db;
+//    private CollectionReference today;
+//
+//    private boolean initialized = false;
+
+//    private void init() {
+//        if (!initialized) {
+//            Firestore db = FirestoreClient.getFirestore();
+//            today = db.collection("today");
+//            initialized = true;
+//        }
+//    }
 
     @Setter
     @Value("${naver.client-id}")
@@ -29,11 +44,9 @@ public class CrawlService {
     private String clientSecret;
 
     private final SeleniumCrawler crawler;
-    private final TodayRepository todayRepository;
 
-    public CrawlService(SeleniumCrawler crawler, TodayRepository todayRepository) {
+    public CrawlService(SeleniumCrawler crawler) {
         this.crawler = crawler;
-        this.todayRepository = todayRepository;
     }
 
     // 크롤링하는 거
@@ -63,21 +76,24 @@ public class CrawlService {
                 .retrieve()
                 .bodyToMono(TranslateResponseDTO.class)
                 .block();
-        System.out.println(response);
         return Objects.requireNonNull(response).getMessage().getResult().getTranslatedText();
     }
 
     // 번역 결과 저장 로직
-    public void translateSaveAndApply() throws IOException {
+    public void translateSaveAndApply() throws IOException, InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference today = db.collection("today");
+
         List<Map<String, String>> result = crawler.crawl();
         int index = 1; // rank 나타냄
 
         for (Map<String, String> item : result) {
-            String mmdd = item.get("date");
+            String MMdd = item.get("date");
             String todayMMdd = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd"));
 
-            if (!mmdd.equals(todayMMdd)) {
+            if (!MMdd.equals(todayMMdd)) {
                 System.out.println(todayMMdd+ "날짜 다름");
+                continue;
             }
 
             // 번역 실행
@@ -97,47 +113,89 @@ public class CrawlService {
 
             String name = item.get("name");
 
-            TodayEntity today = TodayEntity.builder()
-                    .name(name)
-                    .content(content)
-                    .lucky(lucky)
-                    .date(LocalDate.now())
-                    .rank(index)
-                    .build();
+            // Firestore에 저장할 데이터 Map 생성
+            Map<String, Object> todayData = Map.of(
+                    "name", name,
+                    "content", content,
+                    "lucky", lucky,
+                    "date", todayMMdd, // 또는 LocalDate.now() 등 원하는 형식
+                    "rank", index
+            );
 
-            todayRepository.save(today);
-            System.out.println("DB 저장완료");
+            // Firestore에 저장 (name+date 조합을 문서 ID로 사용 가능)
+            ApiFuture<?> writeResult = today
+                    .document(todayMMdd)
+                    .collection("zodiacList")
+                    .document(name)
+                    .set(todayData);
+
+            // 결과를 기다려서 예외 발생 시 처리
+            writeResult.get();
+
             index++;
         }
     }
 
     // DB에서 랭킹 가져오는 로직
-    public List<Map<String, String>> getTodayRank(LocalDate date) {
-        List<TodayEntity> todayEntities = todayRepository.findByDate(date);
+    public List<Map<String, String>> getTodayRank(LocalDate date) throws InterruptedException, ExecutionException {
+        // today 컬렉션 (테이블)
+
+        Firestore db = FirestoreClient.getFirestore();
+
+        // 날짜를 "MM-dd" 포맷으로 변환
+        String dateDoc = date.format(DateTimeFormatter.ofPattern("MM-dd"));
+
+        CollectionReference list = db
+                .collection("today")
+                .document(dateDoc)
+                .collection("zodiacList");
+
+//        Query todayQuery = today.whereEqualTo("date", date);
+        ApiFuture<QuerySnapshot> todayFuture = list.get();
+        List<QueryDocumentSnapshot> documents = todayFuture.get().getDocuments();
+
         List<Map<String, String>> result = new ArrayList<>();
-        for (TodayEntity entity : todayEntities) {
+        for (QueryDocumentSnapshot todayDoc : documents) {
             Map<String, String> item = new HashMap<>();
-            item.put("name", entity.getName());
-            item.put("content", entity.getContent());
-            item.put("lucky", entity.getLucky());
-            item.put("rank", String.valueOf(entity.getRank()));
+            item.put("name", todayDoc.getString("name"));
+            item.put("content", todayDoc.getString("content"));
+            item.put("lucky", todayDoc.getString("lucky"));
+            item.put("rank", String.valueOf(todayDoc.getLong("rank")));
             result.add(item);
         }
         return result;
     }
 
-    public List<Map<String, String>> getContentLucky(String name, LocalDate date) {
-        List<TodayEntity> todayEntities = todayRepository.findByDate(date);
-        List<Map<String, String>> result = new ArrayList<>();
-        for (TodayEntity entity : todayEntities) {
-            Map<String, String> item = new HashMap<>();
-            if (entity.getName().equals(name)) {
-                item.put("content", entity.getContent());
-                item.put("lucky", entity.getLucky());
-                item.put("rank", String.valueOf(entity.getRank()));
-                result.add(item);
-            }
+    public List<Map<String, String>> getContentLucky(String name, LocalDate date) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference today = db.collection("today");
+
+        // 날짜를 "MM-dd" 포맷으로 변환
+        String dateDoc = date.format(DateTimeFormatter.ofPattern("MM-dd"));
+
+        // 문서 경로: today/{dateDoc}/zodiacList/{name}
+        DocumentReference docRef = today
+                .document(dateDoc)
+                .collection("zodiacList")
+                .document(name);
+
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        DocumentSnapshot doc = future.get();
+
+        if (!doc.exists()) {
+            throw new IllegalArgumentException("오늘의 운세 정보가 없습니다.");
         }
-        return result;
+
+        Map<String, String> result = new HashMap<>();
+        result.put("content", doc.getString("content"));
+        result.put("lucky", doc.getString("lucky"));
+        result.put("rank", String.valueOf(doc.getLong("rank")));
+
+        // List로 감싸서 반환
+        List<Map<String, String>> resultList = new ArrayList<>();
+        resultList.add(result);
+        return resultList;
     }
+
+
 }

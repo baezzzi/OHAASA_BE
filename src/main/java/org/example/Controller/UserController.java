@@ -1,34 +1,27 @@
 package org.example.Controller;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.example.DTO.UserDTO;
-import org.example.Entity.UserEntity;
-import org.example.Repository.UserRepository;
 import org.example.Service.UserService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
-    }
-
-    @GetMapping("/")
-    public String home() {
-        System.out.print("hello");
-        return "home";
     }
 
     @PostMapping("/sign-up")
@@ -37,7 +30,7 @@ public class UserController {
             // email, uid 전달받음
             userService.createUser(userDTO);
             return ResponseEntity.ok("회원가입 성공!");
-        } catch (IllegalArgumentException e) {
+        } catch (ExecutionException | InterruptedException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -46,61 +39,66 @@ public class UserController {
     public ResponseEntity<String> birth(@RequestParam String email, @RequestBody UserDTO userDTO) {
         try {
             userService.updateBirthInfoByEmail(email, userDTO);
-            System.out.println(userDTO);
             return ResponseEntity.ok("별자리와 생일 저장완료");
-        } catch (IllegalArgumentException e) {
+        } catch (ExecutionException | InterruptedException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/find-birth")
-    public LocalDate findBirth(@RequestParam String email) {
-        return userService.getBirthByEmail(email);
+    public Date findBirth(@RequestParam String email) {
+        try {
+            return userService.getBirthByEmail(email);
+        } catch (ExecutionException | InterruptedException  e) {
+            return new Date();
+        }
     }
 
-    // 튜토리얼 true일 때
+    // 튜토리얼 true 일 때
     @GetMapping("/is-first-login")
-    public ResponseEntity<Map<String, Boolean>> isFirstLogin(@RequestParam String email) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    public ResponseEntity<Map<String, Boolean>> isFirstLogin(@RequestParam String email) throws InterruptedException, ExecutionException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection("users");
+
+        // email 로 사용자 문서 검색
+        Query query = collection.whereEqualTo("email", email);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        QuerySnapshot snapshot = querySnapshot.get();
 
         Map<String, Boolean> response = new HashMap<>();
-        response.put("firstLogin", user.isFirstLogin());
-        System.out.println(user.isFirstLogin());
+        if (snapshot.isEmpty()) {
+            // 사용자가 없으면 false 반환 (또는 예외 처리 가능)
+            response.put("firstLogin", false);
+        } else {
+            DocumentSnapshot document = snapshot.getDocuments().get(0);
+            Boolean firstLogin = document.getBoolean("firstLogin");
+            response.put("firstLogin", firstLogin != null && firstLogin);
+        }
         return ResponseEntity.ok(response);
     }
 
+
     // 튜토리얼 완료
     @PostMapping("/complete-tutorial")
-    public ResponseEntity<String> completeTutorial(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
+    public ResponseEntity<String> completeTutorial(@RequestBody Map<String, String> request){
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference collection = db.collection("users");
 
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstLogin", false);
 
-        user.setFirstLogin(false);
-        userRepository.save(user);
-
+        DocumentReference documentReference = collection.document(request.get("email"));
+        ApiFuture<WriteResult> writeResult = documentReference.update(updates);
         return ResponseEntity.ok("튜토리얼 완료");
-    }
-
-    @PostMapping("/{id}/profile-image")
-    public ResponseEntity<?> uploadProfileImage(@PathVariable("id") String id, @RequestParam("file") MultipartFile file) {
-        try {
-            String filename = userService.saveImage(id, file);
-            UserEntity user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not fount"));
-            user.setImage(filename);
-            userRepository.save(user);
-            return ResponseEntity.ok("이미지 저장 완료");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 
     @GetMapping("/find-nickname")
     public String getNicknameById(@RequestParam String email) {
-        return userService.getNicknameByEmail(email);
+        try {
+            return userService.getNicknameByEmail(email);
+        } catch (ExecutionException | InterruptedException  e) {
+            return e.getMessage();
+        }
     }
 
     @PostMapping("/save-nickname")
@@ -110,7 +108,7 @@ public class UserController {
         try{
             userService.updateNicknameByEmail(email, nickname);
             return ResponseEntity.ok("닉네임 저장 완료");
-        } catch (IllegalArgumentException e) {
+        }  catch (ExecutionException | InterruptedException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -119,8 +117,8 @@ public class UserController {
     public int getZodiacByEmail(@RequestParam String email) {
         try {
             return userService.getZodiacByEmail(email);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        } catch (ExecutionException | InterruptedException  e) {
+            return Integer.parseInt(e.getCause().getMessage());
         }
     }
 
@@ -130,7 +128,16 @@ public class UserController {
         try {
             userService.deleteUser(email);
             return ResponseEntity.ok("사용자 삭제");
-        } catch (IllegalArgumentException e) {
+        } catch (ExecutionException | InterruptedException  e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/find-user")
+    public ResponseEntity<String> findUser(@RequestParam String email) {
+        try {
+            return userService.findUser(email);
+        } catch (ExecutionException | InterruptedException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

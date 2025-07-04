@@ -1,48 +1,28 @@
 package org.example.Entity;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "User")
 public class UserEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
-
-    @Column(length = 30, nullable = false)
     private String email;
-
-    @Column(length = 10)
     private String nickname;
-
     private int zodiac;
-
     private String image;
-
-    @Column(name = "birth")
-    private LocalDate birth;
-
-    @Column(name = "fcm_token")
+    private Date birth;
     private String fcmToken;
-
     private String uid;
-
-    @Column(name = "first_login")
     private boolean firstLogin = true;
 
     @Builder
-    public UserEntity(int id, String nickname, String email, int zodiac, String image, LocalDate birth, String fcmToken, String uid, boolean firstLogin) {
-        this.id = id;
+    public UserEntity(String nickname, String email, int zodiac, String image, Date birth, String fcmToken, String uid, boolean firstLogin) {
         this.email = email;
         this.nickname = nickname;
         this.zodiac = zodiac;
@@ -52,6 +32,4 @@ public class UserEntity {
         this.uid = uid;
         this.firstLogin = firstLogin;
     }
-
-
 }
