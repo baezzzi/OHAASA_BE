@@ -22,19 +22,6 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class CrawlService {
 
-//    private Firestore db;
-//    private CollectionReference today;
-//
-//    private boolean initialized = false;
-
-//    private void init() {
-//        if (!initialized) {
-//            Firestore db = FirestoreClient.getFirestore();
-//            today = db.collection("today");
-//            initialized = true;
-//        }
-//    }
-
     @Setter
     @Value("${naver.client-id}")
     private String clientId;
@@ -150,7 +137,6 @@ public class CrawlService {
                 .document(dateDoc)
                 .collection("zodiacList");
 
-//        Query todayQuery = today.whereEqualTo("date", date);
         ApiFuture<QuerySnapshot> todayFuture = list.get();
         List<QueryDocumentSnapshot> documents = todayFuture.get().getDocuments();
 
@@ -163,6 +149,7 @@ public class CrawlService {
             item.put("rank", String.valueOf(todayDoc.getLong("rank")));
             result.add(item);
         }
+
         return result;
     }
 
