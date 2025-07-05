@@ -16,7 +16,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
-    implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
 
     // Lombok
     compileOnly("org.projectlombok:lombok:1.18.30")
@@ -28,6 +27,7 @@ dependencies {
     implementation("org.seleniumhq.selenium:selenium-java:4.17.0")
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
     runtimeOnly ("io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64")
+    implementation ("org.springframework.boot:spring-boot-starter-web")
 }
 
 
