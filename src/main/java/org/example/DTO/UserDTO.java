@@ -18,6 +18,7 @@ public class UserDTO {
     private Date birth;
     private String uid;
     private boolean firstLogin;
+    private String fcmToken;
 
     public UserEntity toEntity() {
         return UserEntity.builder()
@@ -27,6 +28,7 @@ public class UserDTO {
                 .birth(this.birth)
                 .uid(this.uid)
                 .firstLogin(this.firstLogin)
+                .fcmToken(this.fcmToken)
                 .build();
     }
 }

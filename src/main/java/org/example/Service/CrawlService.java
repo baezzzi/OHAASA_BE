@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.Component.SeleniumCrawler;
-import org.example.DTO.TranslateResponseDTO;
+//import org.example.DTO.TranslateResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
