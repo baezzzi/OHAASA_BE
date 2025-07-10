@@ -29,7 +29,7 @@ public class FcmMessageScheduler {
         );
     }
 
-    @Scheduled(cron = "0 15 17 ? * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 22 17 ? * *", zone = "Asia/Seoul")
     public void sendMonthMessage() {
         fcmService.sendMessage(
                 "테스트",
