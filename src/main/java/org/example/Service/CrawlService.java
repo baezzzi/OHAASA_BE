@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.Component.SeleniumCrawler;
-//import org.example.DTO.TranslateResponseDTO;
+import org.example.DTO.TranslateResponseDTO;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -58,7 +59,7 @@ public class CrawlService {
                 .header("x-ncp-apigw-api-key-id", clientId)
                 .header("x-ncp-apigw-api-key", clientSecret)
                 .header("Content-Type", "application/x-www-form-urlencoded")
-//                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(data)
                 .retrieve()
                 .bodyToMono(TranslateResponseDTO.class)

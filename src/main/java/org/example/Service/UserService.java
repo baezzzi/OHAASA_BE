@@ -21,7 +21,7 @@ public class UserService {
     private final static String COLLECTION_NAME = "users";
 
 
-    public void createUser(UserDTO userDTO) throws ExecutionException, InterruptedException {
+    public String createUser(UserDTO userDTO) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
 
         userDTO.setFirstLogin(true);
@@ -29,6 +29,9 @@ public class UserService {
 
         // 이메일이 문서 Id
         String docId = newUser.getEmail();
+        String token = newUser.getFcmToken();
+        System.out.println("fcmToken" + token);
+        System.out.flush();
 
         try {
             ApiFuture<WriteResult> future = db
@@ -36,10 +39,10 @@ public class UserService {
                     .document(docId)
                     .set(newUser);
             future.get();
+            return "fcmtoken" + token;
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     // zodiac setting 에서 쓰는 거 (생일, 별자리 저장)
