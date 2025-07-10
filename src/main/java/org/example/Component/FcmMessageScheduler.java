@@ -29,11 +29,4 @@ public class FcmMessageScheduler {
         );
     }
 
-    @Scheduled(cron = "0 42 17 ? * *", zone = "Asia/Seoul")
-    public void sendMonthMessage() {
-        fcmService.sendMessage(
-                "OzO",
-                "오늘의 오하아사가 도착했습니다!"
-        );
-    }
 }
