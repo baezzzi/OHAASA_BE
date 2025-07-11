@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class CrawlService {
 
         for (Map<String, String> item : result) {
             String MMdd = item.get("date");
-            String todayMMdd = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd"));
+            String todayMMdd = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("MM-dd"));
 
             if (!MMdd.equals(todayMMdd)) {
                 System.out.println(todayMMdd+ "날짜 다름");

@@ -7,10 +7,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -24,11 +22,6 @@ import java.util.regex.Pattern;
 public class SeleniumCrawler {
 
     public List<Map<String, String>> crawl() throws IOException {
-//        File driverFile = new ClassPathResource("driver/chromedriver").getFile();
-//        boolean success = driverFile.setExecutable(true);
-//        if(!success) {
-//            System.out.println("설정 실패" + driverFile.getAbsolutePath());
-//        }
         System.setProperty("webdriver.chrome.driver", "/home/ec2-user/.ssh/OHAASA_BE/src/main/resources/driver/chromedriver");
 
         ChromeOptions options = new ChromeOptions();

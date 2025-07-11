@@ -16,7 +16,7 @@ public class HoroscopeSaveScheduler {
         this.crawlService = crawlService;
     }
 
-    @Scheduled(cron = "0 58 6 ? * MON-FRI", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 57 15 ? * MON-FRI", zone = "Asia/Seoul")
     public void saveScheduler() throws IOException, InterruptedException, ExecutionException {
         crawlService.translateSaveAndApply();
         System.out.println("번역 완료 및 결과 저장");

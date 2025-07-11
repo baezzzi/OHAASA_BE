@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.TimeZone;
+
 
 @EnableScheduling
 @SpringBootApplication(
@@ -19,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Main {
     public static void main(String[] args) {
 
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         SpringApplication.run(Main.class, args);
 
     }

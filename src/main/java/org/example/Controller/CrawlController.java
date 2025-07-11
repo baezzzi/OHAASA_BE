@@ -18,11 +18,6 @@ public class CrawlController {
         this.crawlService = crawlService;
     }
 
-    @GetMapping("/horoscope")
-    public List<Map<String, String>> getHoroscopes() {
-        return crawlService.runCrawler();
-    }
-
     // 번역하기 위한 엔드포인트
     @PostMapping("/translate")
     public String translate(@RequestParam String source,@RequestParam String target,@RequestParam String text) {
