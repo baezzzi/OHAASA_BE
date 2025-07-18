@@ -22,7 +22,7 @@ public class HoroscopeSaveScheduler {
         System.out.println("번역 완료 및 결과 저장");
     }
 
-    @Scheduled(cron = "0 6 15 ? * MON-FRI", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 20 15 ? * MON-FRI", zone = "Asia/Seoul")
     public void saveScheduler2() throws IOException, InterruptedException, ExecutionException {
         crawlService.translateSaveAndApply();
         System.out.println("번역 완료 및 결과 저장");
