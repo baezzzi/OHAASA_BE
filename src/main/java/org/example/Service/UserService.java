@@ -20,7 +20,6 @@ public class UserService {
 
     private final static String COLLECTION_NAME = "users";
 
-
     public String createUser(UserDTO userDTO) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
 
@@ -30,8 +29,6 @@ public class UserService {
         // 이메일이 문서 Id
         String docId = newUser.getEmail();
         String token = newUser.getFcmToken();
-        System.out.println("fcmToken" + token);
-        System.out.flush();
 
         try {
             ApiFuture<WriteResult> future = db

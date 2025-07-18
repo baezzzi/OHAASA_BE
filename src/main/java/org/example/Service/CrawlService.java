@@ -187,4 +187,28 @@ public class CrawlService {
     }
 
 
+    // 전 날 별자리 등수를 가져와야됨
+    public String getYesterdayRank(String name, String date) {
+        try {
+            Firestore db = FirestoreClient.getFirestore();
+            CollectionReference today = db.collection("today");
+
+            DocumentReference docRef = db
+                    .document(date)
+                    .collection("zodiacList")
+                    .document(name);
+
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot doc = future.get();
+
+            if (!doc.exists()) {
+                throw new IllegalArgumentException("오늘의 운세 정보가 없습니다.");
+            }
+
+            return String.valueOf(doc.getLong("rank"));
+
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

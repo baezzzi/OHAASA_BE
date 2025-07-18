@@ -44,4 +44,9 @@ public class CrawlController {
             throw new RuntimeException(e);
         }
     }
+
+    @GetMapping("/yesterday-rank")
+    public String getYesterdayRank(@RequestParam String name, String date) {
+        return crawlService.getYesterdayRank(name, date);
+    }
 }
