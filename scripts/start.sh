@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT="/home/ec2-user/.ssh/OHAASA_BE/build/libs"
+PROJECT_ROOT="/home/ec2-user/.ssh/OHAASA_BE"
 JAR_FILE="$PROJECT_ROOT/ohasa_back-1.0-SNAPSHOT.jar"
 
 APP_LOG="$PROJECT_ROOT/application.log"
