@@ -193,7 +193,7 @@ public class CrawlService {
             Firestore db = FirestoreClient.getFirestore();
             CollectionReference today = db.collection("today");
 
-            DocumentReference docRef = db
+            DocumentReference docRef = today
                     .document(date)
                     .collection("zodiacList")
                     .document(name);

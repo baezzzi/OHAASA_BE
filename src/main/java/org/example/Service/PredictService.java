@@ -51,8 +51,6 @@ public class PredictService {
             CollectionReference collectionReference = fb.collection(COLLECTION_NAME);
             String docId = collectionReference.document(email).getId();
 
-//            String todayMMdd = LocalDate.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("MM-dd"));
-
             DocumentReference docRef = collectionReference
                     .document(docId)
                     .collection("predict")
