@@ -17,9 +17,9 @@ import java.util.concurrent.ExecutionException;
 public class PredictService {
 
     private final static String COLLECTION_NAME = "quiz";
-    Firestore fb = FirestoreClient.getFirestore();
 
     public void savePredict(String email, PredictDTO predictDTO) {
+        Firestore fb = FirestoreClient.getFirestore();
         CollectionReference collectionReference = fb.collection(COLLECTION_NAME);
         String docId = collectionReference.document(email).getId();
 
@@ -45,6 +45,8 @@ public class PredictService {
 
     // 당일 예측 가져오기
     public Map<String, String> getPredict(String email, String date) {
+        Firestore fb = FirestoreClient.getFirestore();
+
         try {
             CollectionReference collectionReference = fb.collection(COLLECTION_NAME);
             String docId = collectionReference.document(email).getId();
